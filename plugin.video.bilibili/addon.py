@@ -80,9 +80,13 @@ cache = plugin.get_storage('cache')
 
 headers = {
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36',
-    'Connection': 'close'}
+    'Connection': 'close',
+}
 mheaders = {
-    'user-agent': 'Mozilla/5.0 (Linux; Android 10; Z832 Build/MMB29M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.116 Mobile Safari/537.36'}
+    'user-agent': 'Mozilla/5.0 (Linux; Android 10; Z832 Build/MMB29M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.116 Mobile Safari/537.36'
+}
+r = requests.get("https://www.bilibili.com", headers=headers)
+cookies = r.cookies
 
 
 # 仿b站随机输出主播正在xx
@@ -212,11 +216,11 @@ def get_html(url, t=1, debug='no', head=''):
                 r = get_html_1hour(url, head=head)
     else:
         if head == '':
-            r = requests.get(url, headers=headers)
+            r = requests.get(url, headers=headers, cookies=cookies)
             r.encoding = 'utf-8'
             r = r.text
         else:
-            r = requests.get(url, headers=json.loads(head))
+            r = requests.get(url, headers=json.loads(head), cookies=cookies)
             r.encoding = 'utf-8'
             r = r.text
     return r
@@ -225,9 +229,9 @@ def get_html(url, t=1, debug='no', head=''):
 @plugin.cached(TTL=60)
 def get_html_1hour(url, head=''):
     if head == '':
-        r = requests.get(url, headers=headers)
+        r = requests.get(url, headers=headers, cookies=cookies)
     else:
-        r = requests.get(url, headers=json.loads(head))
+        r = requests.get(url, headers=json.loads(head), cookies=cookies)
     r.encoding = 'utf-8'
     r = r.text
     return r
@@ -236,9 +240,9 @@ def get_html_1hour(url, head=''):
 @plugin.cached(TTL=10)
 def get_html_10min(url, head=''):
     if head == '':
-        r = requests.get(url, headers=headers)
+        r = requests.get(url, headers=headers, cookies=cookies)
     else:
-        r = requests.get(url, headers=json.loads(head))
+        r = requests.get(url, headers=json.loads(head), cookies=cookies)
     r.encoding = 'utf-8'
     r = r.text
     return r
@@ -247,12 +251,13 @@ def get_html_10min(url, head=''):
 @plugin.cached(TTL=1)
 def get_html_1min(url, head=''):
     if head == '':
-        r = requests.get(url, headers=headers)
+        r = requests.get(url, headers=headers, cookies=cookies)
     else:
-        r = requests.get(url, headers=json.loads(head))
+        r = requests.get(url, headers=json.loads(head), cookies=cookies)
     r.encoding = 'utf-8'
     r = r.text
     return r
+
 
 # 修改了API,参见Issue: https://github.com/MoyuScript/bilibili-api/issues/244
 def get_up_roominfo(uid):
@@ -415,11 +420,11 @@ def get_search(keyword, page):
     r = get_html(serachUrl, t=10)
     j = json.loads(r)
     # 视频
-    k = j['data']['result'][8]['data']
+    k = j['data']['result'][10]['data']
     # 番剧
-    bgm = j['data']['result'][3]['data']
+    bgm = j['data']['result'][5]['data']
     # 影视
-    mov = j['data']['result'][4]['data']
+    mov = j['data']['result'][6]['data']
     videos = []
     for index in range(len(bgm)):
         surl = 'https://www.bilibili.com/bangumi/play/ss' + str(bgm[index]['season_id'])
@@ -493,7 +498,7 @@ def get_vidsearch(keyword, page):
         page) + '&duration=&category_id=&tids_1=&tids_2=&__refresh__=true&_extra=&highlight=1&single_column=0&jsonp=jsonp'
     apiheaders = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
-        'Referer': 'https://search.bilibili.com/all?keyword=' + urllib.parse.quote(keyword)
+        'Referer': 'https://search.bilibili.com/all?keyword=' + urllib.parse.quote(keyword),
     }
     r = get_html(serachUrl, head=json.dumps(apiheaders), t=10)
     j = json.loads(r)
@@ -554,7 +559,7 @@ def get_bgsearch(keyword, page):
         page) + '&category_id=&__refresh__=true&_extra=&highlight=1&single_column=1&jsonp=jsonp'
     apiheaders = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
-        'Referer': 'https://search.bilibili.com/all?keyword=' + urllib.parse.quote(keyword)
+        'Referer': 'https://search.bilibili.com/all?keyword=' + urllib.parse.quote(keyword),
     }
     r = get_html(serachUrl, head=json.dumps(apiheaders), t=10)
     j = json.loads(r)
@@ -604,7 +609,7 @@ def get_movsearch(keyword, page):
         page) + '&category_id=&__refresh__=true&_extra=&highlight=1&single_column=0&jsonp=jsonp'
     apiheaders = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
-        'Referer': 'https://search.bilibili.com/all?keyword=' + urllib.parse.quote(keyword)
+        'Referer': 'https://search.bilibili.com/all?keyword=' + urllib.parse.quote(keyword),
     }
     r = get_html(serachUrl, head=json.dumps(apiheaders), t=10)
     j = json.loads(r)
@@ -700,7 +705,7 @@ def get_upsearch(keyword, page):
         page) + '&category_id=&user_type=&order_sort=&changing=mid&__refresh__=true&_extra=&highlight=1&single_column=0&jsonp=jsonp'
     apiheaders = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
-        'Referer': 'https://search.bilibili.com/all?keyword=' + urllib.parse.quote(keyword)
+        'Referer': 'https://search.bilibili.com/all?keyword=' + urllib.parse.quote(keyword),
     }
     r = get_html(serachUrl, head=json.dumps(apiheaders), t=10)
     j = json.loads(r)
@@ -1559,7 +1564,7 @@ def get_roominfo(id):
 
     ro = j['data']
 
-    soup = BeautifulSoup(ro['description'], "html5lib")
+    soup = BeautifulSoup(ro['description'], "html.parser")
 
     flvdict['title'] = ro['title']
     flvdict['img'] = ro['user_cover']
@@ -2497,6 +2502,7 @@ def search(value, page):
     else:
         keyboard = xbmc.Keyboard('', '请输入搜索内容')
         xbmc.sleep(1500)
+        his['search'] = his.get('search', {})
         hi = his['search']
         if value != 'null':
             keyboard.setDefault(value)
@@ -2533,6 +2539,7 @@ def bgsearch(value, page):
     else:
         keyboard = xbmc.Keyboard('', '请输入搜索内容')
         xbmc.sleep(1500)
+        his['bgsearch'] = his.get('bgsearch', {})
         hi = his['bgsearch']
         if value != 'null':
             keyboard.setDefault(value)
@@ -2569,6 +2576,7 @@ def movsearch(value, page):
     else:
         keyboard = xbmc.Keyboard('', '请输入搜索内容')
         xbmc.sleep(1500)
+        his['movsearch'] = his.get('movsearch', {})
         hi = his['movsearch']
         if value != 'null':
             keyboard.setDefault(value)
@@ -2605,6 +2613,7 @@ def vidsearch(value, page):
     else:
         keyboard = xbmc.Keyboard('', '请输入搜索内容')
         xbmc.sleep(1500)
+        his['vidsearch'] = his.get('vidsearch', {})
         hi = his['vidsearch']
         if value != 'null':
             keyboard.setDefault(value)
@@ -2641,6 +2650,7 @@ def livesearch(value, page):
     else:
         keyboard = xbmc.Keyboard('', '请输入搜索内容')
         xbmc.sleep(1500)
+        his['livesearch'] = his.get('livesearch', {})
         hi = his['livesearch']
         if value != 'null':
             keyboard.setDefault(value)
@@ -2676,6 +2686,7 @@ def upsearch(value, page):
     else:
         keyboard = xbmc.Keyboard('', '请输入搜索内容')
         xbmc.sleep(1500)
+        his['upsearch'] = his.get('upsearch', {})
         hi = his['upsearch']
         if value != 'null':
             keyboard.setDefault(value)
@@ -2710,6 +2721,7 @@ def vid(value):
     if value != 'null':
         keyboard.setDefault(value)
     keyboard.doModal()
+    his['vid'] = his.get('vid', {})
     hi = his['vid']
     if (keyboard.isConfirmed()):
         if re.search('[Bb]{1}[Vv]{1}[a-zA-Z0-9]+', keyboard.getText()) or re.search('[aA]{1}[vV]{1}[0-9]+',
@@ -2744,7 +2756,7 @@ def roomid(value):
         keyboard = xbmc.Keyboard('', '请输入房间号(纯数字)：')
         xbmc.sleep(1500)
         keyboard.doModal()
-
+        his['roomid'] = his.get('roomid', {})
         hi = his['roomid']
         if (keyboard.isConfirmed()):
             keyword = keyboard.getText()
@@ -2977,7 +2989,6 @@ def history(name, url):
     # his[url] ={'aaa':'2019-01-23 10:00:00','bbb':'2019-01-23 09:01:00','ccc':'2019-01-23 09:00:59'}
     if url in his:
         hi = his[url]
-
     else:
         his[url] = {}
         hi = his[url]
