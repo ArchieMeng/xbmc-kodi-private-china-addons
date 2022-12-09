@@ -675,7 +675,6 @@ def get_livesearch(keyword, page):
             title = bgm[index]['title']
             if int(bgm[index]['live_status']) == 1:
                 title += u' [COLOR pink][LIVE][/COLOR]'
-            title += u' [在线' + zh(bgm[index]['online']) + u']'
             pic = bgm[index]['cover']
             # 清除b站api数据污染
             title = title.replace('<em class="keyword">', '')
@@ -1572,7 +1571,6 @@ def get_roominfo(id):
     jianjie = '房间号:' + str(ro['room_id']) + '\n'
     if ro['short_id'] != 0:
         jianjie += '短房间号:' + str(ro['short_id']) + '\n'
-    jianjie += '在线:' + zh(ro['online']) + '\n'
 
     if ro['live_status'] == 1:
         flvdict['status'] = '开播'
@@ -2884,8 +2882,7 @@ def up(uid, page):
             'icon': u['data']['face'],
         })
         if int(r['liveStatus']) == 1:
-            livename = u'通往[COLOR yellow]' + u['data']['name'] + u'[/COLOR]的直播间:' + u'[在线' + zh(
-                r['online']) + u']' + u'[COLOR red][·LIVE][/COLOR]' + r['title']
+            livename = u'通往[COLOR yellow]' + u['data']['name'] + u'[/COLOR]的直播间:' + u'[COLOR red][·LIVE][/COLOR]' + r['title']
         else:
             livename = u'[COLOR yellow]' + u['data']['name'] + u'[/COLOR]的直播间:' \
                        + u'[COLOR green][Close][/COLOR]' + r['title']
