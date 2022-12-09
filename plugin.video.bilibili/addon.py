@@ -1599,15 +1599,34 @@ def get_roominfo(id):
 
 
 # 获取真实直播地址
-def get_roommp4(id):
-    r = get_html('https://api.live.bilibili.com/xlive/web-room/v1/index/getRoomPlayInfo?room_id=' + str(
-        id) + '&play_url=1&mask=0&qn=0&platform=web')
-    j = json.loads(r)
+def get_roommp4(room_id):
+
+    r = get_html(
+        f"https://api.live.bilibili.com/xlive/web-room/v2/index/getRoomPlayInfo?room_id={room_id}"
+        "&protocol=0,1&format=0,1,2&codec=0,1&mask=0&qn=10000&platform=h5&ptype=8"
+    )
+    respon_json = json.loads(r)
     vlist = []
     try:
-        flv = j['data']['play_url']['durl']
-        for index in range(len(flv)):
-            vlist.append(flv[index]['url'])
+        stream_info = respon_json['data']['playurl_info']['playurl']['stream']
+        qn_max = 0
+
+        for data in stream_info:
+            accept_qn = data['format'][0]['codec'][0]['accept_qn']
+            for qn in accept_qn:
+                qn_max = qn if qn > qn_max else qn_max
+
+        # flv流无法播放，暂修改成获取hls格式的流，
+        for data in stream_info:
+            format_name = data['format'][0]['format_name']
+            if format_name == 'ts':
+                base_url = data['format'][-1]['codec'][0]['base_url']
+                url_info = data['format'][-1]['codec'][0]['url_info']
+                for i, info in enumerate(url_info):
+                    host = info['host']
+                    extra = info['extra']
+                    vlist.append(f'{host}{base_url}{extra}')
+                break
     except TypeError:
         dialog = xbmcgui.Dialog()
         dialog.notification('获取直播源地址失败', '可能房间号不存在未开播', xbmcgui.NOTIFICATION_ERROR, 5000, False)
