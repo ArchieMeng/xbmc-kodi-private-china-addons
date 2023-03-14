@@ -8,7 +8,7 @@ import shutil
 import hashlib
 
 
-workpath = '/workdir/python2/'
+workpath = os.path.dirname(__file__) + "/.."
 
 addons_xml = et.Element('addons')
 

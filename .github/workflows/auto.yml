@@ -1,38 +1,34 @@
 name: kodi 插件自动化
-on: push
+on:
+  push:
+    branches:
+    - py2
 
 jobs: 
   my-job: 
     runs-on: ubuntu-latest
     name: 打包Kodi插件并自动更新插件库
-    steps: 
-    - name: 初始化环境
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: 安装依赖
       run: |
-        sudo mkdir -p /workdir
-        sudo chown $USER:$GROUPS /workdir
-        sudo apt install python
-    - name: 克隆代码
-      working-directory: /workdir
-      run: |
-        df -hT $PWD
-        git clone https://github.com/zhengfan2014/xbmc-kodi-private-china-addons -b py2 python2
+        sudo apt install python2 -y
     - name: 运行python
       run: |
-        python /workdir/python2/.github/auto.py
+        python2 .github/auto.py
     - name: Commit 文件
       run: |
-        cd /workdir/python2
         git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         git add repo
         git add addons.xml
         git add addons.xml.md5
         git commit -m "[bot] 自动打包插件并推送到存储库"
-        git init
     - name: Push 到 Github
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         branch: py2
-        repository: zhengfan2014/xbmc-kodi-private-china-addons
-        directory: /workdir/python2
+        repository: ArchieMeng/xbmc-kodi-private-china-addons
+        directory: .
