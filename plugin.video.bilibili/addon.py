@@ -854,7 +854,7 @@ def get_bangumiinfo(url):
             cast.append((cast2[0], cast2[1]))
         else:
             cast.append(cast1[index])
-    mp4info['cast'] = cast
+    # mp4info['cast'] = cast
 
     tag = []
     for index in range(len(j2['mediaInfo']['styles'])):
@@ -927,7 +927,7 @@ def get_mp4info(url):
         up = j['upData']['name']
         fan = zh(j['upData']['fans']) + '粉丝'
         cast.append((up, fan))
-    mp4info['cast'] = cast
+    # mp4info['cast'] = cast
 
     mp4info['dateadded'] = uptime
     mp4info['aired'] = data
@@ -1592,7 +1592,7 @@ def get_roominfo(id):
     j = json.loads(get_up_baseinfo(ro['uid']))
     # up主 cast
     fan = zh(ro['attention']) + '粉丝'
-    flvdict['cast'] = [(j['data']['name'], fan)]
+    # flvdict['cast'] = [(j['data']['name'], fan)]
 
     flvdict['mediatype'] = 'video'
     return flvdict
